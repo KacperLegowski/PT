@@ -1,190 +1,94 @@
 package model;
-
+import java.util.Set;
+import java.io.File;
+import java.lang.System;
+import java.util.AbstractSet;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.TreeSet;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 /**
  * Created by klego on 14.03.2017.
  */
-
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-class SizeComparator implements Comparator<DiskElement> {
-
-
-    @Override
-    public int compare(DiskElement firstObject, DiskElement secondObject) {
-        //  boolean alphabetical=false;
-        if(firstObject.lastModified.compareTo(secondObject.lastModified)<0){
-
-            return -1;
+public class DiskDirectory extends DiskElement{
+    private Set<DiskElement> children;
+    public DiskDirectory(File file,String interf)
+    {
+        super(file);
+        System.out.print(file.getName());
+        if(interf.compareTo("Comparator")==0 )
+        {
+            children=new TreeSet<DiskElement>(new CompFiles());
         }
-
-
-        return 1;
-    }
-}
-
-
-public class DiskDirectory extends DiskElement {
-    HashSet<DiskElement> notSortedHashChildren =new HashSet<>();
-    TreeSet<DiskElement> TreeChildren =new TreeSet<DiskElement>();
-    Set<DiskElement> ComparatorTreeChildren =new TreeSet<>( new SizeComparator() );
-
-    File[] files;
-    String mode;
-
-    public static long folderSize(File directory) {
-        long length = 0;
-        for (File file : directory.listFiles()) {
-            if (file.isFile())
-                length += file.length();
-            else
-                length += folderSize(file);
+        else if(interf.compareTo("Comparable")==0)
+        {
+            children=new TreeSet<DiskElement>();
         }
-        return length;
-    }
-
-    public DiskDirectory(String path, boolean sorted,String argMode) {
-        mode=argMode;
-        file = new File(path);
-        basename =  file .getName();
-        files = file.listFiles();
-        isDir=true;
-        lastModifiedMS = file.lastModified();
-        lastModified = new Date(lastModifiedMS);
-        bytes=folderSize(file);
-
-
-
-        File[] subfiles =  file .listFiles();
-        if (subfiles != null) {
-            for (File subfile : subfiles) {
-                switch(mode){
-                    case "1" :
-                        if (subfile.isDirectory()){
-                            notSortedHashChildren.add(new DiskDirectory(subfile.getAbsolutePath(),sorted,mode));
-                        }else{
-                            notSortedHashChildren.add(new DiskFile(subfile.getAbsolutePath()));
-                        }
-                        break;
-
-                    case "2":
-                        if (subfile.isDirectory()){
-                            TreeChildren.add(new DiskDirectory(subfile.getAbsolutePath(),sorted,mode));
-                        }else{
-                            TreeChildren.add(new DiskFile(subfile.getAbsolutePath()));
-                        }
-                        break;
-                    case "3":
-                        if (subfile.isDirectory()){
-                            ComparatorTreeChildren.add(new DiskDirectory(subfile.getAbsolutePath(),sorted,mode));
-                        }else{
-                            ComparatorTreeChildren.add(new DiskFile(subfile.getAbsolutePath()));
-                        }
-                        break;
-                }
+        File[] files=file.listFiles();
+        for(int i=0;files.length>i;i++)
+        {
+            if(files[i].isDirectory())
+            {
+                DiskDirectory newDir=new DiskDirectory(files[i],interf);
+                children.add(newDir);
+            }
+            else if(files[i].isFile())
+            {
+                DiskFile newFile=new DiskFile(files[i]);
+                children.add(newFile);
             }
         }
     }
-
-
-    @Override
-    protected void print( int depth){
-        String text = "-";
-        for (int i = 0; i < depth; i++) {
-            text=text + "-";
+    public Set<DiskElement> getChildren()
+    {
+        return children;
+    }
+    public boolean equals(DiskDirectory o2)
+    {
+        if(super.equals(o2))
+        {
+            Set<DiskElement> seto2=o2.getChildren();
+            if(seto2.size()==children.size())
+            {
+                DiskElement[] tab;
+                DiskElement[] tab2;
+                tab=seto2.toArray(new DiskElement[seto2.size()]);
+                tab2=children.toArray(new DiskElement[seto2.size()]);
+                for(int i=0;seto2.size()>i;i++)
+                {
+                    if(tab[i]!=tab2[i])
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
-
-     /*   if (isDir==true) {
-            text=text + "\\";
-        } else {
-            text=text + "| ";
-        }*/
-
-        text=text + basename;
-
-        text=text + "  F         ";
-
-        text=text + new SimpleDateFormat("yyyy-MM-dd").format( lastModified);
-
-        text=text +"  " +bytes;
-
-        System.out.println(text);
-        switch(mode){
-
-            case "1":
-                for (DiskElement filee : notSortedHashChildren) {
-                    filee.print(depth + 1);
-                }
-                break;
-
-            case "2":
-                for (DiskElement filee : TreeChildren) {
-                    filee.print(depth + 1);
-                }
-                break;
-            case "3":
-                for (DiskElement filee : ComparatorTreeChildren) {
-                    filee.print(depth + 1);
-                }
-                break;
-
-
-
+        else
+        {
+            return false;
         }
     }
-
-    @Override public int hashCode() {
-        int hash = 3; hash = 53 * hash + Objects.hashCode(this.basename);
-        hash = 53 * hash + Objects.hashCode(this.files);
-        hash = 53 * hash + Objects.hashCode(this.isDir);
-        hash = 53 * hash + Objects.hashCode(this.lastModifiedMS );
-        hash = 53 * hash + Objects.hashCode(this.file);
-        return hash;
-    }
-
-
-
-    @Override public boolean equals(Object obj) {
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
+    protected void print(int depth) {
+        SimpleDateFormat template=new SimpleDateFormat("yyyy-MM-dd");
+        String formDate=template.format(lastModifiedMS);
+        String toPrint="";
+        for(int i=0;depth>i;i++)
+        {
+            toPrint=toPrint+"-";
+        }
+        toPrint=toPrint+file.getName();
+        System.out.printf("%-80s %-80s %-80s %d \n",toPrint,"K",formDate,file.length());
+        for(DiskElement element:children)
+        {
+            element.print(depth+1);
         }
 
-        final DiskFile other = (DiskFile) obj;
-
-        if (!Objects.equals(this.basename, other.basename)) {
-            return false;
-        }
-
-        if (!Objects.equals(this.lastModifiedMS, other.lastModifiedMS)) {
-            return false;
-        }
-
-        if (this.isDir != other.isDir) {
-            return false;
-        }
-
-        return Objects.equals(this.file, other.file);
-    }
-
-    @Override
-    public int compareTo(DiskElement secondObject) { //comparator
-
-        boolean alphabetical=false;
-        if(this.basename.compareTo(secondObject.basename)<0){
-            alphabetical=true;
-        }
-
-        if(this.isDir && !secondObject.isDir){
-            return -1;
-        }
-
-        if(this.isDir && secondObject.isDir && alphabetical){
-        /* (this.file.getTotalSpace()>t.file.getTotalSpace())*/
-            return -1;
-        }
-
-
-        return 1;
     }
 }
