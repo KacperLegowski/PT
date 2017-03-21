@@ -1,0 +1,26 @@
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.TableView?>
+<VBox
+        prefWidth="500"
+        fx:id="vBoxRoot"
+        fx:controller="sample.Controller"
+        xmlns:fx="http://javafx.com/fxml">
+
+    <Button
+            prefWidth="320"
+            fx:id="btnPickFile"
+            text="Wybierz pliki"/>
+
+
+    <TableView
+            prefHeight="500"
+            prefWidth="320"
+            fx:id="tableView"/>
+
+    <Button
+            prefWidth="320"
+            fx:id="btnSendFiles"
+            text="Wyślij"/>
+
+</VBox>
