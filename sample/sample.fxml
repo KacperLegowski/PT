@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<GridPane alignment="center" hgap="10" vgap="10" xmlns="http://javafx.com/javafx/8.0.71" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+   <children>
+      <TableView fx:id="tabela" minHeight="400.0" minWidth="500.0" opacity="0.85" prefHeight="200.0" prefWidth="200.0">
+        <columns>
+            <TableColumn fx:id="imageNameColumn" prefWidth="130.0" text="NAZWA" />
+            <TableColumn fx:id="progressColumn" prefWidth="225.0" text="PROGRES" />
+            <TableColumn fx:id="statusColumn" prefWidth="140.0" text="STATUS" />
+        </columns>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+      </TableView>
+      <Pane prefHeight="50.0" prefWidth="200.0" GridPane.rowIndex="3">
+         <children>
+            <Button  onAction="#chooseFileAction" layoutX="240.0" layoutY="-12.0" minHeight="44.0" minWidth="80.0" mnemonicParsing="false" text="WYBIERZ PLIKI" />
+            <Button  onAction="#sendFileAction" layoutX="367.0" layoutY="-12.0" minHeight="44.0" minWidth="80.0" mnemonicParsing="false" text="KONWERTUJ" />
+            <ChoiceBox fx:id="cb" accessibleText="LATO" layoutX="20.0" layoutY="3.0" prefWidth="150.0">
+               <opaqueInsets>
+                  <Insets top="4.0" />
+               </opaqueInsets></ChoiceBox>
+            <Label layoutX="20.0" layoutY="-13.0" text="RODZAJ PRZESYŁANIA:" />
+         </children>
+      </Pane>
+   </children>
+   <columnConstraints>
+      <ColumnConstraints />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints />
+      <RowConstraints />
+      <RowConstraints />
+      <RowConstraints />
+   </rowConstraints>
+</GridPane>
