@@ -1,0 +1,142 @@
+package net.stawrul;
+
+import net.stawrul.model.Book;
+import net.stawrul.model.Order;
+import net.stawrul.services.OrdersService;
+import net.stawrul.services.exceptions.OutOfStockException;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import javax.persistence.EntityManager;
+import net.stawrul.services.exceptions.ValidationException;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.times;
+
+@RunWith(MockitoJUnitRunner.class)
+public class OrdersServiceTest {
+
+    @Mock
+    EntityManager em;
+//brak ksiazki
+    @Test(expected = OutOfStockException.class)
+    public void whenOrderedBookNotAvailable_placeOrderThrowsOutOfStockEx() {
+        //Arrange
+        Order order = new Order();
+        Book book = new Book();
+        book.setAmount(0);
+        book.setCena(80);
+        order.getBooks().add(book);
+
+        Mockito.when(em.find(Book.class, book.getId())).thenReturn(book);
+
+        OrdersService ordersService = new OrdersService(em);
+
+        //Act
+        ordersService.placeOrder(order);
+
+        //Assert - exception expected
+    }
+//zmniejaszenie ilosci o 1
+    @Test
+    public void whenOrderedBookAvailable_placeOrderDecreasesAmountByOne() {
+        //Arrange
+        Order order = new Order();
+        Book book = new Book();
+        book.setAmount(4);
+        book.setCena(50);
+        order.getBooks().add(book);
+
+        Mockito.when(em.find(Book.class, book.getId())).thenReturn(book);
+
+        OrdersService ordersService = new OrdersService(em);
+
+        //Act
+        ordersService.placeOrder(order);
+
+        //Assert
+        //dostępna liczba książek zmniejszyła się:
+        assertEquals(3, (int)book.getAmount());
+        //nastąpiło dokładnie jedno wywołanie em.persist(order) w celu zapisania zamówienia:
+        Mockito.verify(em, times(1)).persist(order);
+    }
+
+    @Test
+    public void whenGivenLowercaseString_toUpperReturnsUppercase() {
+
+        //Arrange
+        String lower = "abcdef";
+
+        //Act
+        String result = lower.toUpperCase();
+
+        //Assert
+        assertEquals("ABCDEF", result);
+    }
+   
+    //za mala cena
+   @Test(expected = ValidationException.class)
+    public void whenCostIsLessThan50_PlaceOrderthrowsValidationException() {
+        //Arrange
+        Order order = new Order();
+        Book books = new Book();
+        books.setAmount(1);
+        books.setCena(45);
+        order.getBooks().add(books);
+        
+        Mockito.when(em.find(Book.class, books.getId())).thenReturn(books);
+        
+        OrdersService ordersService = new OrdersService(em);
+        //Act
+        
+        ordersService.placeOrder(order);
+    }
+
+    //wszystko ok
+    @Test
+    public void whenOrderedBooksAvailableAndMoreThan1_placeOrderDecreasesAmountByOne() {
+        //Arrange
+        Order order = new Order();
+        Book books = new Book();
+        books.setAmount(6);
+        books.setCena(100);
+        order.getBooks().add(books);
+
+        Mockito.when(em.find(Book.class, books.getId())).thenReturn(books);
+
+        OrdersService ordersService = new OrdersService(em);
+        //Act
+        ordersService.placeOrder(order);
+        //Assert
+        //dostępna liczba książek zmniejszyła się:
+        assertEquals(5, (int)books.getAmount());
+        //nastąpiło dokładnie jedno wywołanie em.persist(order) w celu zapisania zamówienia:
+        Mockito.verify(em, times(1)).persist(order);
+    }
+    
+    
+
+    //zmniejaszanie o kilka ksiazek
+    @Test
+    public void whenOrderedBooksAvailable_PlaceOrderDecreasesAmountByNumberOfBooks(){
+        Order order = new Order();
+        Book book1 = new Book();
+        Book book2 = new Book();
+        book1.setAmount(3);
+        book2.setAmount(2);
+        book1.setCena(80);
+        book2.setCena(60);
+        order.getBooks().add(book1);
+        order.getBooks().add(book2);
+        Mockito.when(em.find(Book.class, book1.getId())).thenReturn(book1);
+        Mockito.when(em.find(Book.class, book2.getId())).thenReturn(book2);
+        OrdersService ordersService = new OrdersService(em);
+        //Act
+        ordersService.placeOrder(order);
+        assertEquals(2, (int)book1.getAmount());
+        assertEquals(1, (int)book2.getAmount());
+    }
+}
