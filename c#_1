@@ -1,0 +1,152 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.Serialization;
+
+namespace _1
+{
+    public static class MyExtensions
+    {
+        public static DateTime OldestElemDate(this DirectoryInfo directory, DateTime? prevOldest = null)
+        {
+            if (prevOldest == null || prevOldest < directory.LastWriteTime)
+                prevOldest = directory.LastWriteTime;
+
+            foreach (FileSystemInfo info in directory.GetFileSystemInfos())
+            {
+                if (info.LastWriteTime < prevOldest)
+                    prevOldest = info.LastWriteTime;
+            }
+
+            foreach (DirectoryInfo dir in directory.GetDirectories())
+            {
+                DateTime date = dir.OldestElemDate();
+                if (date < prevOldest)
+                    prevOldest = date;
+            }
+
+            return (DateTime) prevOldest;
+        }
+
+        public static string DosAttributes(this FileSystemInfo info)
+        {
+            FileAttributes attribs = info.Attributes;
+            return ((attribs & FileAttributes.ReadOnly) > 0 ? "r" : "-") +
+                ((attribs & FileAttributes.Archive) > 0 ? "a" : "-") +
+                ((attribs & FileAttributes.Hidden) > 0 ? "h" : "-") +
+                ((attribs & FileAttributes.System) > 0 ? "s" : "-");
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            // G:\University\Platformy technologiczne\Laboratorium\dotNET
+            // D:\AL
+
+            Console.WriteLine("(1)");
+            ShowDir(new DirectoryInfo(args[0]));
+            Console.WriteLine();
+
+            Console.WriteLine("(2)");
+            ShowDir(new DirectoryInfo(args[0]), true);
+            Console.WriteLine();
+
+            Console.WriteLine("(b)");
+
+            /*
+            FileStream fs = new FileStream("D:\\test.dat", FileMode.Create);
+            BinaryFormatter formatter = new BinaryFormatter();
+            try
+            {
+                formatter.Serialize(fs, addresses);
+            }
+            catch (SerializationException e)
+            {
+                Console.WriteLine("Failed to serialize. Reason: " + e.Message);
+                throw;
+            }
+            finally
+            {
+                fs.Close();
+            }*/
+
+            foreach (KeyValuePair<string, long> entry in MakeDict(new DirectoryInfo(args[0])))
+            {
+                Console.WriteLine("{0} -> {1}", entry.Key, entry.Value);
+            }
+
+            Console.ReadKey();
+        }
+
+        static void ShowDir(DirectoryInfo directory, bool recursive = false, int indent = 0)
+        {
+            try
+            {
+                foreach (FileInfo file in directory.GetFiles())
+                {
+                    Console.WriteLine("{0}{1} {2} {3}", 
+                        new string(' ', indent), 
+                        file.Name,
+                        file.Length,
+                        file.DosAttributes());
+                }
+
+                foreach (DirectoryInfo dir in directory.GetDirectories())
+                {
+                    Console.WriteLine("{0}{1} ({2}) {3}", 
+                        new string(' ', indent), 
+                        dir.Name,
+                        dir.GetFileSystemInfos().Length,
+                        dir.DosAttributes());
+                    if (recursive)
+                        ShowDir(dir, recursive, indent + 2);
+                }
+
+            }
+            catch (System.Exception ex)
+            {
+                Console.WriteLine("ERROR: " + ex.Message);
+            }
+        }
+
+        static SortedDictionary<string, long> MakeDict(DirectoryInfo directory)
+        {
+            SortedDictionary<string, long> result =
+                new SortedDictionary<string, long>(new NameComparer());
+
+            foreach (FileInfo file in directory.GetFiles())
+            {
+                result.Add(file.Name, file.Length);
+            }
+
+            foreach (DirectoryInfo dir in directory.GetDirectories())
+            {
+                try
+                {
+                    result.Add(dir.Name, dir.GetFileSystemInfos().Length);
+                }
+                catch (UnauthorizedAccessException ex)
+                {}
+            }
+
+            return result;
+        }
+
+        private class NameComparer : IComparer<string>
+        {
+            public int Compare(string x, string y)
+            {
+                if (x.Length != y.Length)
+                    return x.Length - y.Length;
+                else
+                    return x.CompareTo(y);
+            }
+        }
+    } 
+}
