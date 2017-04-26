@@ -29,7 +29,7 @@ namespace _1
                     prevOldest = date;
             }
 
-            return (DateTime) prevOldest;
+            return (DateTime)prevOldest;
         }
 
         public static string DosAttributes(this FileSystemInfo info)
@@ -46,25 +46,26 @@ namespace _1
     {
         static void Main(string[] args)
         {
-            // G:\University\Platformy technologiczne\Laboratorium\dotNET
-            // D:\AL
-
-            Console.WriteLine("(1)");
             ShowDir(new DirectoryInfo(args[0]));
             Console.WriteLine();
-
-            Console.WriteLine("(2)");
-            ShowDir(new DirectoryInfo(args[0]), true);
-            Console.WriteLine();
-
             Console.WriteLine("(b)");
+            SortedDictionary<string, long> tmp = MakeDict(new DirectoryInfo(args[0]));
+            Serialize(tmp);
 
-            /*
-            FileStream fs = new FileStream("D:\\test.dat", FileMode.Create);
+             foreach (KeyValuePair<string, long> entry in tmp)
+            {
+                Console.WriteLine("{0} -> {1}", entry.Key, entry.Value);
+            }
+            Console.ReadKey();
+        }
+
+        static void Serialize(SortedDictionary<string, long> tmp)
+        {
+            FileStream fs = new FileStream("DataFile.dat", FileMode.Create);
             BinaryFormatter formatter = new BinaryFormatter();
             try
             {
-                formatter.Serialize(fs, addresses);
+                formatter.Serialize(fs, tmp);
             }
             catch (SerializationException e)
             {
@@ -74,24 +75,40 @@ namespace _1
             finally
             {
                 fs.Close();
-            }*/
-
-            foreach (KeyValuePair<string, long> entry in MakeDict(new DirectoryInfo(args[0])))
-            {
-                Console.WriteLine("{0} -> {1}", entry.Key, entry.Value);
             }
-
-            Console.ReadKey();
         }
 
-        static void ShowDir(DirectoryInfo directory, bool recursive = false, int indent = 0)
+        static void Deserialize(SortedDictionary<string, long> tmp) 
+    {
+        FileStream fs = new FileStream("DataFile.dat", FileMode.Open);
+        try 
+        {
+            BinaryFormatter formatter = new BinaryFormatter();
+            tmp = (SortedDictionary<string, long>) formatter.Deserialize(fs);
+        }
+        catch (SerializationException e) 
+        {
+            Console.WriteLine("Failed to deserialize. Reason: " + e.Message);
+            throw;
+        }
+        finally 
+        {
+            fs.Close();
+        }
+
+
+        
+    }
+
+
+        static void ShowDir(DirectoryInfo directory, bool recursive = true, int indent = 0)
         {
             try
             {
                 foreach (FileInfo file in directory.GetFiles())
                 {
-                    Console.WriteLine("{0}{1} {2} {3}", 
-                        new string(' ', indent), 
+                    Console.WriteLine("{0}{1} {2} {3}",
+                        new string(' ', indent),
                         file.Name,
                         file.Length,
                         file.DosAttributes());
@@ -99,8 +116,8 @@ namespace _1
 
                 foreach (DirectoryInfo dir in directory.GetDirectories())
                 {
-                    Console.WriteLine("{0}{1} ({2}) {3}", 
-                        new string(' ', indent), 
+                    Console.WriteLine("{0}{1} ({2}) {3}",
+                        new string(' ', indent),
                         dir.Name,
                         dir.GetFileSystemInfos().Length,
                         dir.DosAttributes());
@@ -132,12 +149,12 @@ namespace _1
                     result.Add(dir.Name, dir.GetFileSystemInfos().Length);
                 }
                 catch (UnauthorizedAccessException ex)
-                {}
+                { }
             }
 
             return result;
         }
-
+        [Serializable]
         private class NameComparer : IComparer<string>
         {
             public int Compare(string x, string y)
@@ -148,5 +165,5 @@ namespace _1
                     return x.CompareTo(y);
             }
         }
-    } 
+    }
 }
