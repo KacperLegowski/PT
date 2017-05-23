@@ -1,0 +1,25 @@
+﻿<Window x:Class="laborka_4.Window1"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:laborka_4"
+        mc:Ignorable="d"
+        Title="Window1" Height="425" Width="300">
+    <Grid>
+        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="88,19,0,0" TextWrapping="Wrap" Text="CAR" VerticalAlignment="Top" RenderTransformOrigin="0.145,0.131" Height="28" Width="66"/>
+        <TextBlock x:Name="textBlock_Copy" HorizontalAlignment="Left" Margin="88,145,0,0" TextWrapping="Wrap" Text="ENGINE" VerticalAlignment="Top" RenderTransformOrigin="0.145,0.131" Height="28" Width="81"/>
+        <TextBlock x:Name="textBlock_Copy1" HorizontalAlignment="Left" Margin="20,68,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="0.145,0.131" Height="18" Width="42"><Run Text="Mode"/><Run Text="l"/></TextBlock>
+        <TextBlock x:Name="textBlock_Copy2" HorizontalAlignment="Left" Margin="20,102,0,0" TextWrapping="Wrap" Text="Year" VerticalAlignment="Top" RenderTransformOrigin="0.145,0.131" Height="18" Width="30"/>
+        <TextBlock x:Name="textBlock_Copy3" HorizontalAlignment="Left" Margin="20,193,0,0" TextWrapping="Wrap" Text="Engine Model" VerticalAlignment="Top" RenderTransformOrigin="0.145,0.131" Height="18" Width="81"/>
+        <TextBlock x:Name="textBlock_Copy4" HorizontalAlignment="Left" Margin="20,230,0,0" TextWrapping="Wrap" Text="Displacement" VerticalAlignment="Top" RenderTransformOrigin="0.145,0.131" Height="18" Width="81"/>
+        <TextBlock x:Name="textBlock_Copy5" HorizontalAlignment="Left" Margin="25,269,0,0" TextWrapping="Wrap" Text="Horse Power" VerticalAlignment="Top" RenderTransformOrigin="0.145,0.131" Height="18" Width="81"/>
+        <TextBox x:Name="modelBox" HorizontalAlignment="Left" Height="23" Margin="67,67,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" RenderTransformOrigin="0.178,-0.24"/>
+        <TextBox x:Name="yearBox" HorizontalAlignment="Left" Height="23" Margin="67,102,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" RenderTransformOrigin="0.178,-0.24"/>
+        <TextBox x:Name="engineBox" HorizontalAlignment="Left" Height="23" Margin="114,188,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" RenderTransformOrigin="0.178,-0.24"/>
+        <TextBox x:Name="disBox" HorizontalAlignment="Left" Height="23" Margin="114,230,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" RenderTransformOrigin="0.178,-0.24"/>
+        <TextBox x:Name="horseBox" HorizontalAlignment="Left" Height="23" Margin="114,269,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" RenderTransformOrigin="0.178,-0.24"/>
+        <Button x:Name="save_button" Content="Save" HorizontalAlignment="Left" Margin="106,341,0,0" VerticalAlignment="Top" Click="save_button_Click" Width="97" RenderTransformOrigin="-0.09,-0.179"/>
+
+    </Grid>
+</Window>
